@@ -72,7 +72,8 @@ namespace vl { namespace impl {
       int numPatchesX = (width + (padLeft + padRight) - nWindowWidth)/strideX + 1 ;
       int numPatchesY = (height + (padTop + padBottom) - nWindowHeight)/strideY + 1 ;
       int numRows = windowWidth * windowHeight * depth ;
-      int blank_per_height = ((dilateY - 1) * nWindowWidth) - dilateX + 1;
+      int empty_rows = ((dilateY - 1) * nWindowWidth);
+      int blank_per_height = empty_rows - dilateX + 1;
       /*
        Fill a row of the stacked image at a time. Since patches are stored
        along the columns, scanning a row menas visiting all patche once.
@@ -88,7 +89,8 @@ namespace vl { namespace impl {
          image.
          */
         int nRow = ( row * dilateX ) + 
-              ( row / windowWidth ) * blank_per_height;
+              ( row / windowWidth ) * blank_per_height -
+              ( row / (windowWidth*windowHeight)) * empty_rows;
         int u = nRow ;
         int v = u / nWindowWidth ;
         int z = v / nWindowHeight ;
@@ -184,7 +186,8 @@ namespace vl { namespace impl {
       int numPatchesX = (width + (padLeft + padRight) - nWindowWidth)/strideX + 1 ;
       int numPatchesY = (height + (padTop + padBottom) - nWindowHeight)/strideY + 1 ;
       int numRows = windowWidth * windowHeight * depth ;
-      int blank_per_height = ((dilateY - 1) * nWindowWidth) - dilateX + 1;
+      int empty_rows = ((dilateY - 1) * nWindowWidth);
+      int blank_per_height = empty_rows - dilateX + 1;
 
       memset(data, 0, sizeof(type) * width * height * depth) ;
 
@@ -194,7 +197,8 @@ namespace vl { namespace impl {
        */
       for (int row = 0; row < numRows ; ++row) {
         int nRow = ( row * dilateX ) + 
-              ( row / windowWidth ) * blank_per_height;
+              ( row / windowWidth ) * blank_per_height -
+              ( row / (windowWidth*windowHeight)) * empty_rows;
         int u = nRow ;
         int v = u / nWindowWidth ;
         int z = v / nWindowHeight ;
