@@ -196,10 +196,10 @@ namespace vl { namespace impl {
         int nRow = ( row * dilateX ) + 
               ( row / windowWidth ) * blank_per_height;
         int u = nRow ;
-        int v = u / windowWidth ;
-        int z = v / windowHeight ;
-        u %= windowWidth ;
-        v %= windowHeight ;
+        int v = u / nWindowWidth ;
+        int z = v / nWindowHeight ;
+        u %= nWindowWidth ;
+        v %= nWindowHeight ;
 
         int x0 = static_min(numPatchesX, ceil_divide(padLeft - u, strideX)) ;
         int y0 = static_min(numPatchesY, ceil_divide(padTop - v, strideY)) ;
