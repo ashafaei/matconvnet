@@ -20,7 +20,7 @@ DEBUG ?=
 ARCH ?= maci64
 
 # Configure MATLAB
-MATLABROOT ?= /Applications/MATLAB_R2015a.app
+MATLABROOT ?= /Applications/MATLAB_R2014a.app
 
 # Configure CUDA and CuDNN. CUDAMETHOD can be either 'nvcc' or 'mex'.
 CUDAROOT ?= /Developer/NVIDIA/CUDA-6.5
