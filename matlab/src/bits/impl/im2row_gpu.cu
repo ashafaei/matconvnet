@@ -13,7 +13,7 @@ the terms of the BSD license (see the COPYING file).
 #include "im2row.hpp"
 #include "../datacu.hpp"
 #include <iostream>
-#include "../mexutils.h"
+// #include "../mexutils.h"
 
 using namespace vl ;
 
@@ -148,8 +148,8 @@ im2row_backward_kernel(T* data,
 
     int dx = x_data + padLeft - nWindowWidth ;
     int dy = y_data + padTop - nWindowHeight ;
-    int x1 = (dx >= 0) ? dx/strideX + 1 : (dilateX==1 ? 0 : (x_data + padLeft)/strideX % dilateX) ;
-    int y1 = (dy >= 0) ? dy/strideY + 1 : (dilateY==1 ? 0 : (y_data + padTop)/strideY % dilateY) ;
+    int x1 = (dx >= 0) ? dx/strideX + 1 : 0 ;
+    int y1 = (dy >= 0) ? dy/strideY + 1 : 0 ;
     int x2 = min((x_data + padLeft) / strideX, numPatchesX - 1) ;
     int y2 = min((y_data + padTop) / strideY, numPatchesY - 1) ;
 
@@ -179,15 +179,20 @@ im2row_backward_kernel(T* data,
     // int deltax = (1 - (strideX*numPatchesY*numPatchesX)/dilateX);
     // int deltay = (1 - (strideY*numPatchesY*windowWidth)/dilateY)*numPatchesX ;
     // stacked += ((z * windowHeight + (y_data + padTop)/dilateY) * windowWidth + (x_data + padLeft)/dilateX ) * (numPatchesX*numPatchesY) ;
-
-    for (int y = y1 ; y <= y2 ; y += dilateY) {
-      for (int x = x1 ; x <= x2 ; x += dilateX) {
-        int u_x = (x_data - (x * strideX - padLeft))/dilateX;
-        int v_y = (y_data - (y * strideY - padTop))/dilateY;
-
-        int ptr = (y * numPatchesX + x) + ((z * windowHeight + v_y) * windowWidth + u_x) * (numPatchesX*numPatchesY);
-
-        // accumulator += stacked[y * deltay + x * deltax];
+    stacked += ((z * windowHeight) * windowWidth) * (numPatchesX*numPatchesY);
+    for (int y = y1 ; y <= y2 ; ++y ) {
+      int v_y = (y_data - (y * strideY - padTop));
+      if (v_y % dilateY != 0){
+        continue;
+      }
+      v_y = v_y/dilateY;
+      for (int x = x1 ; x <= x2 ; ++x ) {
+        int u_x = (x_data - (x * strideX - padLeft));
+        if (u_x % dilateX != 0){
+          continue;
+        }
+        u_x = u_x/dilateX;
+        int ptr = (y * numPatchesX + x) + (u_x + v_y * windowWidth) * (numPatchesX*numPatchesY);
         accumulator += stacked[ptr];
       }
     }
@@ -286,7 +291,7 @@ namespace vl { namespace impl {
       // int numPatchesX = (width + (padLeft + padRight) - windowWidth)/strideX + 1 ;
       // int numPatchesY = (height + (padTop + padBottom) - windowHeight)/strideY + 1 ;
       int dataVolume = width * height * depth ;
-      mexPrintf("I do work 9\n");
+      // mexPrintf("I do work 11\n");
       im2row_backward_kernel<type>
       <<< divideUpwards(dataVolume, VL_CUDA_NUM_THREADS), VL_CUDA_NUM_THREADS >>>
       (data,
