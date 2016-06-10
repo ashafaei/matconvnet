@@ -94,7 +94,8 @@ vl::nnconv_forward(Context& context,
 #if ENABLE_GPU
     case vl::GPU:
 #if ENABLE_CUDNN
-      if (context.getCudaHelper().getCudnnEnabled()) {
+      if ((dilateX == 1 && dilateY == 1) &&
+           context.getCudaHelper().getCudnnEnabled()) {
         DISPATCHCUDNN2() ;
         if (error == vl::vlSuccess) { return error ; }
         if (error != vl::vlErrorUnsupported) { goto done ; }
@@ -172,7 +173,8 @@ vl::nnconv_backward(Context& context,
 #if ENABLE_GPU
     case vl::GPU:
 #if ENABLE_CUDNN
-      if (context.getCudaHelper().getCudnnEnabled()) {
+      if ((dilateX == 1 && dilateY == 1) && 
+          context.getCudaHelper().getCudnnEnabled()) {
         DISPATCHCUDNN2() ;
         if (error == vl::vlSuccess) { return error ; }
         if (error != vl::vlErrorUnsupported) { goto done ; }
